@@ -9,6 +9,7 @@ class CalculatorApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark(),
       home: CalculatorScreen(),
     );
   }
@@ -49,7 +50,11 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           if (intList.length < 2) {
             return 'Error: invalid number of arguments';
           }
-          intList.add(doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast()));
+          String hold = doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast());
+          if (hold == 'Error: Dividing by 0') {
+            return hold;
+          }
+          intList.add(int.parse(hold));
         }
         operList.add(expression[i]);
         num = '';
@@ -62,7 +67,11 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       if (intList.length <= 1) {
         return 'Error: invalid number of arguments';
       }
-      intList.add(doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast()));
+      String hold = doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast());
+      if (hold == 'Error: Dividing by 0') {
+        return hold;
+      }
+      intList.add(int.parse(hold));
     }
     if (intList.length != 1) {
       return 'Error: Invalid Expression';
@@ -70,31 +79,35 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     return intList.removeLast().toString();
   }
 
-  int doOperations(int num1, int num2, String oper) {
+  String doOperations(int num1, int num2, String oper) {
     if (oper == '+') {
-      return num2 + num1;
+      num2 += num1;
     } else if (oper == '-') {
-      return num2 - num1;
+      num2 -= num1;
     } else if (oper == '*') {
-      return num2 * num1;
+      num2 *= num1;
     } else {
       if (num1 == 0) {
-
+        return 'Error: Dividing by 0';
       }
-      return num2 ~/ num1;
+      num2 ~/= num1;
     }
+    return num2.toString();
   }
 
   Widget _buildButton(String text) {
-    return Expanded(
-      child: ElevatedButton(
-        onPressed: () => _onButtonPressed(text),
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.all(36),
-        ),
-        child: Text(
-          text,
-          style: TextStyle(fontSize: 32),
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Expanded(
+        child: ElevatedButton(
+          onPressed: () => _onButtonPressed(text),
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.all(36),
+          ),
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 32),
+          ),
         ),
       ),
     );
