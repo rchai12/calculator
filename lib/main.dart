@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -40,13 +42,27 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
   String _evaluateExpression(String expression) {
     try {
-      
+      String num = '';
+      final intList = <int> [];
+      final operList = <String> [];
+      for (int i = 0; i < expression.length; i++) {
+        if(expression[i] == '+' || expression[i] == '-' || expression[i] == '*' || expression[i] == '/') {
+          operList.add(expression[i]);
+          intList.add(int.parse(num));
+          num = '';
+        } else {
+          num = num + expression[i];
+        }
+      }
+      intList.add(int.parse(num));
+      expression = doOperations(intList, operList);
       return expression;
     } catch (e) {
       return 'Error';
     }
   }
 
+  
   Widget _buildButton(String text) {
     return Expanded(
       child: ElevatedButton(
