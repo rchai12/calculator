@@ -28,11 +28,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       if (value == 'C') {
         _display = '';
       } else if (value == '=') {
-        try {
-          _display = _evaluateExpression(_display);
-        } catch (e) {
-          _display = 'Error';
-        }
+        _display = _evaluateExpression(_display);
       } else {
         _display += value;
       }
@@ -48,7 +44,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         intList.add(int.parse(num));
         if (operList.isNotEmpty && (operList.last == '*' || operList.last == '/')) {
           if (intList.length < 2) {
-            return 'Error: invalid number of arguments';
+            return 'Error: Invalid number of arguments';
           }
           String hold = doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast());
           if (hold == 'Error: Dividing by 0') {
@@ -65,7 +61,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     intList.add(int.parse(num));
     for (int i = operList.length; i > 0; i--) {
       if (intList.length <= 1) {
-        return 'Error: invalid number of arguments';
+        return 'Error: Invalid number of arguments';
       }
       String hold = doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast());
       if (hold == 'Error: Dividing by 0') {
@@ -106,7 +102,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           ),
           child: Text(
             text,
-            style: TextStyle(fontSize: 32),
+            style: TextStyle(fontSize: 36),
           ),
         ),
       ),
@@ -125,7 +121,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               padding: EdgeInsets.all(24),
               child: Text(
                 _display,
-                style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 52, fontWeight: FontWeight.bold),
               ),
             ),
           ),
