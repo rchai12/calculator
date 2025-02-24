@@ -47,21 +47,40 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       final operList = <String> [];
       for (int i = 0; i < expression.length; i++) {
         if(expression[i] == '+' || expression[i] == '-' || expression[i] == '*' || expression[i] == '/') {
-          operList.add(expression[i]);
           intList.add(int.parse(num));
+          if (operList.last == '*' || operList.last == '/') {
+            intList.add(doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast()));
+          }
+          operList.add(expression[i]);
           num = '';
         } else {
           num = num + expression[i];
         }
       }
       intList.add(int.parse(num));
-      expression = doOperations(intList, operList);
-      return expression;
+      for (int i = 0; i < operList.length; i++) {
+        intList.add(doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast()));
+      }
+      if (intList.length != 1) {
+        return 'Error';
+      }
+      return intList.removeLast().toString();
     } catch (e) {
       return 'Error';
     }
   }
 
+  int doOperations(int num1, int num2, String oper) {
+    if (oper == '+') {
+      return num2 += num1;
+    } else if (oper == '-') {
+      return num2 -= num1;
+    } else if (oper == '*') {
+      return num2 *= num1;
+    } else {
+      return num2 ~/= num1;
+    }
+  }
   
   Widget _buildButton(String text) {
     return Expanded(
