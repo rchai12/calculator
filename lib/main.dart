@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 
 void main() {
@@ -41,57 +39,62 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   }
 
   String _evaluateExpression(String expression) {
-    try {
-      String num = '';
-      final intList = <int> [];
-      final operList = <String> [];
-      for (int i = 0; i < expression.length; i++) {
-        if(expression[i] == '+' || expression[i] == '-' || expression[i] == '*' || expression[i] == '/') {
-          intList.add(int.parse(num));
-          if (operList.last == '*' || operList.last == '/') {
-            intList.add(doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast()));
+    String num = '';
+    final intList = <int>[];
+    final operList = <String>[];
+    for (int i = 0; i < expression.length; i++) {
+      if (expression[i] == '+' || expression[i] == '-' || expression[i] == '*' || expression[i] == '/') {
+        intList.add(int.parse(num));
+        if (operList.isNotEmpty && (operList.last == '*' || operList.last == '/')) {
+          if (intList.length < 2) {
+            return 'Error: invalid number of arguments';
           }
-          operList.add(expression[i]);
-          num = '';
-        } else {
-          num = num + expression[i];
+          intList.add(doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast()));
         }
+        operList.add(expression[i]);
+        num = '';
+      } else {
+        num += expression[i];
       }
-      intList.add(int.parse(num));
-      for (int i = 0; i < operList.length; i++) {
-        intList.add(doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast()));
-      }
-      if (intList.length != 1) {
-        return 'Error';
-      }
-      return intList.removeLast().toString();
-    } catch (e) {
-      return 'Error';
     }
+    intList.add(int.parse(num));
+    for (int i = operList.length; i > 0; i--) {
+      if (intList.length <= 1) {
+        return 'Error: invalid number of arguments';
+      }
+      intList.add(doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast()));
+    }
+    if (intList.length != 1) {
+      return 'Error: Invalid Expression';
+    }
+    return intList.removeLast().toString();
   }
 
   int doOperations(int num1, int num2, String oper) {
     if (oper == '+') {
-      return num2 += num1;
+      return num2 + num1;
     } else if (oper == '-') {
-      return num2 -= num1;
+      return num2 - num1;
     } else if (oper == '*') {
-      return num2 *= num1;
+      return num2 * num1;
     } else {
-      return num2 ~/= num1;
+      if (num1 == 0) {
+
+      }
+      return num2 ~/ num1;
     }
   }
-  
+
   Widget _buildButton(String text) {
     return Expanded(
       child: ElevatedButton(
         onPressed: () => _onButtonPressed(text),
         style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.all(24),
+          padding: EdgeInsets.all(36),
         ),
         child: Text(
           text,
-          style: TextStyle(fontSize: 24),
+          style: TextStyle(fontSize: 32),
         ),
       ),
     );
@@ -127,4 +130,4 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       ),
     );
   }
-} 
+}
