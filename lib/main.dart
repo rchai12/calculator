@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 void main() {
   runApp(CalculatorApp());
@@ -28,13 +29,18 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       if (value == 'C') {
         _display = '';
       } else if (value == '=') {
-        _display = _evaluateExpression(_display);
+        try {
+          _display = _evaluateExpression(_display);
+        } catch (e) {
+          _display = 'Error';
+        }
       } else {
         _display += value;
       }
     });
   }
 
+/*
   String _evaluateExpression(String expression) {
     String num = '';
     final intList = <int>[];
@@ -43,8 +49,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       if (expression[i] == '+' || expression[i] == '-' || expression[i] == '*' || expression[i] == '/') {
         intList.add(int.parse(num));
         if (operList.isNotEmpty && (operList.last == '*' || operList.last == '/')) {
-          if (intList.length < 2) {
-            return 'Error: Invalid number of arguments';
+          if (intList.length <= 1) {
+            return 'Error: Invalid expression';
           }
           String hold = doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast());
           if (hold == 'Error: Dividing by 0') {
@@ -52,8 +58,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           }
           intList.add(int.parse(hold));
         }
-        operList.add(expression[i]);
         num = '';
+        operList.add(expression[i]);
       } else {
         num += expression[i];
       }
@@ -61,7 +67,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     intList.add(int.parse(num));
     for (int i = operList.length; i > 0; i--) {
       if (intList.length <= 1) {
-        return 'Error: Invalid number of arguments';
+        return 'Error: Invalid expression';
       }
       String hold = doOperations(intList.removeLast(), intList.removeLast(), operList.removeLast());
       if (hold == 'Error: Dividing by 0') {
@@ -90,11 +96,24 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     }
     return num2.toString();
   }
+*/
+
+  String _evaluateExpression(String expression) {
+    try {
+      ShuntingYardParser p = ShuntingYardParser();
+      Expression exp = p.parse(expression);
+      ContextModel cm = ContextModel();
+      double result = exp.evaluate(EvaluationType.REAL, cm);
+      return result.toInt().toString();
+    } catch (e) {
+      return 'Error';
+    }
+  }
 
   Widget _buildButton(String text) {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: Expanded(
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
         child: ElevatedButton(
           onPressed: () => _onButtonPressed(text),
           style: ElevatedButton.styleFrom(
@@ -102,7 +121,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           ),
           child: Text(
             text,
-            style: TextStyle(fontSize: 36),
+            style: TextStyle(fontSize: 32),
           ),
         ),
       ),
@@ -132,6 +151,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               ['1', '2', '3', '-'],
               ['C', '0', '=', '+'],
             ].map((row) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: row.map((text) => _buildButton(text)).toList(),
             )).toList(),
           )
